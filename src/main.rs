@@ -1,4 +1,5 @@
 mod y2015;
+mod util;
 
 use std::env;
 use y2015::get_solution_for_day;
