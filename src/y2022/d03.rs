@@ -1,6 +1,14 @@
 use std::fs;
 use crate::util::format_soln_string;
 
+fn get_priority(c: char) -> u32 {
+    if c.is_uppercase() {
+        c as u32 - 38
+    } else {
+        c as u32 - 96
+    }
+}
+
 pub fn soln() -> String {
     let input = fs::read_to_string("src/y2022/input/d03.txt")
         .unwrap();
@@ -11,13 +19,7 @@ pub fn soln() -> String {
         let comps = rucksack.split_at(rucksack.len() / 2);
         for item in comps.0.chars() {
             if comps.1.contains(item) {
-                if item.is_uppercase() {
-                    println!("{} {}", item, (item as u32) - 38);
-                    sum += item as u32 - 38;
-                } else {
-                    println!("{} {}", item, (item as u32) - 96);
-                    sum += item as u32 - 96; 
-                }
+                sum += get_priority(item);
                 break;
             }
         }
