@@ -21,8 +21,8 @@
 		"body": [
 			"use std::fs;",
 			"use crate::util::format_soln_string;",
-			"pub fn soln() -> String {",
 			"",
+			"pub fn soln() -> String {",
     		"    let input = fs::read_to_string(\"src/y2022/input/'$1'.txt\")",
         	"        .unwrap();",
 			"",
