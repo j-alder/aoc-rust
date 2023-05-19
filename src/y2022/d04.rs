@@ -14,28 +14,44 @@ fn parse_section(section_raw: &str) -> (i32, i32) {
     return (sec_vec[0], sec_vec[1]);
 }
 
+fn parse_sections(sections_raw: &str) -> ((i32, i32), (i32, i32)) {
+    let sections: Vec<&str> = sections_raw.split(',').collect();
+    return (parse_section(sections[0]), parse_section(sections[1]));
+}
+
+fn fully_contains(a: (i32, i32), b: (i32, i32)) -> bool {
+    (a.0..=a.1).contains(&b.0) && (a.0..=a.1).contains(&b.1)
+    || 
+    (b.0..=b.1).contains(&a.0) && (b.0..=b.1).contains(&a.1)
+}
+
+fn partially_contains(a: (i32, i32), b: (i32, i32)) -> bool {
+    (a.0..=a.1).contains(&b.0) || (a.0..=a.1).contains(&b.1)
+    ||
+    (b.0..=b.1).contains(&a.0) || (b.0..=b.1).contains(&a.1)
+}
+
 pub fn soln() -> String {
     let input = fs::read_to_string("src/y2022/input/d04.txt")
         .unwrap();
 
-    let pairs_raw = input.split('\n');
-    let part_one = pairs_raw.fold(0, |a: i32, st| {
+    let pairs_raw = input.split('\n').filter(|splt| { !splt.is_empty() });
+
+    let ans = pairs_raw.fold((0, 0), |a: (i32, i32), st| {
         let mut r = a;
-        let sections_raw: Vec<&str> = st.split(',').collect();
-        if sections_raw.len() < 2 {
-            return r;
-        }
-        let section_one = parse_section(sections_raw[0]);
-        let section_two = parse_section(sections_raw[1]);
-        if section_two.0 <= section_one.0 && section_two.1 >= section_one.1 {
-            r += 1;
-        } else if section_one.0 <= section_two.0 && section_one.1 >= section_two.1 {
-            r += 1;
+        let s = parse_sections(st);
+        if fully_contains(s.0, s.1) {
+            r = (r.0 + 1, r.1 + 1);
+        } else if partially_contains(s.0, s.1) {
+            r = (r.0, r.1 + 1);
         }
         return r;
     });
 
-    return format_soln_string(part_one.to_string(), "Incomplete".to_string())
+    return format_soln_string(
+        ans.0.to_string(), 
+        ans.1.to_string()
+    );
 }
 
 /*
@@ -112,6 +128,7 @@ while the remaining four pairs (5-7,7-9, 2-8,3-7, 6-6,4-6, and 2-6,4-8) do overl
     2-8,3-7 overlaps all of the sections 3 through 7.
     6-6,4-6 overlaps in a single section, 6.
     2-6,4-8 overlaps in sections 4, 5, and 6.
+    7-43,5-6
 
 So, in this example, the number of overlapping assignment pairs is 4.
 
