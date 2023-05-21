@@ -38,6 +38,7 @@ pub fn soln() -> String {
     let rucksacks: Vec<String> = input.split('\n').map(|st| String::from(st)).collect();
     let mut part_two_sum = 0;
 
+    // todo: use chunks?
     for x in (0..rucksacks.len() - 1).step_by(3) {
         let sacks = (&rucksacks[x], &rucksacks[x + 1], &rucksacks[x + 2]);
         part_two_sum += find_group_priority(sacks);
