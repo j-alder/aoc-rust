@@ -14,12 +14,12 @@ use d06::soln as soln6;
 
 pub fn get_solution_for_day(day: &str) -> String {
     match day {
-        "1"=>soln1(),
-        "2"=>soln2(),
-        "3"=>soln3(),
-        "4"=>soln4(),
-        "5"=>soln5(),
-        "6"=>soln6(),
-        _=>String::from("No solution found")
+        "1" => soln1(),
+        "2" => soln2(),
+        "3" => soln3(),
+        "4" => soln4(),
+        "5" => soln5(),
+        "6" => soln6(),
+        _ => String::from("No solution found"),
     }
 }

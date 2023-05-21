@@ -1,9 +1,8 @@
-use std::fs;
 use crate::util::format_soln_string;
+use std::fs;
 
 pub fn soln() -> String {
-    let input = fs::read_to_string("src/y2015/input/d01.txt")
-        .unwrap();
+    let input = fs::read_to_string("src/y2015/input/d01.txt").unwrap();
 
     let mut f = 0;
     let mut b: usize = 0;
@@ -12,14 +11,14 @@ pub fn soln() -> String {
         f += match c {
             '(' => 1,
             ')' => -1,
-            _ => 0
+            _ => 0,
         };
         if b == 0 && f == -1 {
             b = i + 1;
         }
     }
 
-    return format_soln_string(f.to_string(), b.to_string())
+    return format_soln_string(f.to_string(), b.to_string());
 }
 
 /*
