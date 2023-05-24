@@ -1,5 +1,5 @@
 use crate::util::format_soln_string;
-use std::fs;
+use std::{fs, cmp::max};
 
 const CHAR_WIDTH: usize = 4;
 
@@ -8,11 +8,14 @@ const CHAR_WIDTH: usize = 4;
  * cargo stack state.
  */
 fn parse_initial_line(ln: &str, vecs: &mut Vec<Vec<char>>) {
-    for n in (0..vecs.len()).step_by(CHAR_WIDTH) {
-        let c = ln.chars().nth(n + CHAR_WIDTH - 3).unwrap();
+    let mut i = 0; // todo: potentially unnecessary memory use
+    for n in (0..ln.len()).step_by(CHAR_WIDTH) {
+        let idx = n + CHAR_WIDTH - 3;
+        let c = ln.chars().nth(idx).unwrap();
         if c != ' ' {
-            vecs[n].insert(0, c);
+            vecs[i].insert(0, c);
         }
+        i += 1;
     }
 }
 
@@ -26,7 +29,7 @@ fn parse_initial_state(raw: Option<&str>) -> Vec<Vec<char>> {
     let state_height = state_raw.collect::<Vec<&str>>().len();
     let vecs = (line_width + 1) / CHAR_WIDTH;
     let mut res: Vec<Vec<char>> = Vec::new();
-    for i in 0..vecs {
+    for _ in 0..vecs {
         res.push(Vec::new());
     }
     raw.unwrap()
@@ -49,25 +52,18 @@ fn parse_initial_state(raw: Option<&str>) -> Vec<Vec<char>> {
  * The to/from stacks are decremented by one to conform to
  * zero-indexed Vecs.
  */
-fn parse_inst(inst_ln: &str) -> (i32, usize, usize) {
+fn parse_inst(inst_ln: &str) -> (usize, usize, usize) {
     let x: Vec<&str> = inst_ln.split(' ').collect();
     return (
-        x[1].parse().unwrap(),
+        x[1].parse::<usize>().unwrap(),
         x[3].parse::<usize>().unwrap() - 1,
         x[5].parse::<usize>().unwrap() - 1,
     );
 }
 
-pub fn soln() -> String {
-    let input = fs::read_to_string("src/y2022/input/d05.txt").unwrap();
-
-    let mut raw = input.split("\n\n");
-
-    let mut stacks = parse_initial_state(raw.clone().nth(0));
-
-    println!("stacks: {:?}", stacks);
-    for raw_inst in raw.nth(1).unwrap().split('\n').filter(|s| !s.is_empty()) {
-        let inst = parse_inst(raw_inst);
+fn part_one(raw_inst: &Vec<&str>, mut stacks: Vec<Vec<char>>) -> String {
+    for ri in raw_inst {
+        let inst = parse_inst(ri);
         for _ in 0..inst.0 {
             let x = stacks[inst.1].pop();
             if x == None {
@@ -76,8 +72,32 @@ pub fn soln() -> String {
             stacks[inst.2].push(x.unwrap());
         }
     }
+    return String::from_iter(stacks.iter().map(|v| v.last().unwrap()));
+}
 
-    return format_soln_string("Incomplete".to_string(), "Incomplete".to_string());
+fn part_two(raw_inst: &Vec<&str>, mut stacks: Vec<Vec<char>>) -> String {
+    for ri in raw_inst {
+        let inst = parse_inst(ri);
+        if stacks[inst.1].len() > 0 {
+            let range = max(0, stacks[inst.1].len() - inst.0)..stacks[inst.1].len()-1;
+            let mut substack: Vec<char> = stacks[inst.1].splice(range, []).collect();
+            stacks[inst.2].append(&mut substack);
+        }
+    }
+    return String::from_iter(stacks.iter().map(|v| v.last().unwrap()));
+}
+
+pub fn soln() -> String {
+    let input = fs::read_to_string("src/y2022/input/d05.txt").unwrap();
+    let mut raw = input.split("\n\n");
+    let stacks1 = parse_initial_state(raw.clone().nth(0));
+    let stacks2 = parse_initial_state(raw.clone().nth(0));
+    let raw_inst: Vec<&str> = raw.nth(1).unwrap().split('\n').filter(|s| !s.is_empty()).collect();
+
+    return format_soln_string(
+        part_one(&raw_inst, stacks1), 
+        part_two(&raw_inst, stacks2)
+    );
 }
 
 /*
