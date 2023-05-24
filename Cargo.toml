@@ -7,3 +7,5 @@ edition = "2021"
 
 [dependencies]
 md5 = "0.7.0"
+reqwest = "0.11.18"
+scraper = "0.16.0"
